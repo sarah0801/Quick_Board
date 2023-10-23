@@ -13,7 +13,19 @@
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <main>
+    <!--<div class="table">
+        <div class="row">
+            <span class="cell" width="82">
+                <div>
+                    <div class="jb_table">
+                      <div class="row">
+                        <span class="cell">
+                            <button class="red" data-color="red">red</button>
+                            <button class="orange" data-color="orange">orange</button>
+            </span>
+        </div>
+    <main>-->
+        <main>
         <aside>
             <ul class="pallet">
                 <li>
@@ -60,10 +72,38 @@
                 </li>
             </ul>
         </aside>
-        <canvas width="600" height="400"></canvas>
+        <canvas width="600" height="4000"></canvas>
     <input id="line-width" type="range" min="1" max="10" value="5" step="0.5"></input>
     <input id="color" type="color"/>
     <script src="main.js"></script>
+    <script>
+       const socket=new WebSocket("ws://localhost:8005");
+       socket.addEventListener("open", () => {
+        console.log("WebSocket is open");
+       });
+       socket.addEventListener("message", (event) => {
+        console.log("Message from server:", event.data);
+       });
+       socket.addEventListener("message", (error) => {
+        console.log("Error has occured:", error);
+       });
+       socket.addEventListener("close", () => {
+        console.log("WebSocket is closed");
+       });
+       socket.onopen = (event) => {
+        socket.send("Hello Server, we are connected");
+       };
+       socket.onerror = (error) => {
+        socket.close();
+        console.log("WebSocket connection is closed due to:", error);
+       };
+       //socket.onopen=function(){
+        //console.log("서버와 웹소켓을 연결했습니다!");
+       //};
+       //socket.onmessage=function(event){
+       //console.log(event.data);
+        //socket.send("")
+    </script>
     </main>
 </body>
 </html>
