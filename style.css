@@ -1,0 +1,72 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+li {
+    list-style: none;
+}
+body {
+    background-color: #384047;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+}
+main {
+    display: grid;
+    grid-template-columns: 40px 600px;
+    column-gap: 10px;
+}
+button {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 10px;
+    font-size: 0;
+    border: 2px solid transparent;
+    border-radius: 5px;
+}
+canvas {
+    background-color: white;
+    border-radius: 10px;
+}
+button.red {
+    background-color: red;
+}
+button.orange {
+    background-color: orange;
+}
+button.yellow {
+    background-color: yellow;
+}
+button.green {
+    background-color: green;
+}
+button.blue {
+    background-color: blue;
+}
+button.purple {
+    background-color: purple;
+}
+button.pink {
+    background-color: pink;
+}
+button.grey {
+    background-color: grey;
+}
+button.black {
+    background-color: black;
+}
+button.white {
+    background-color: white;
+}
+button.selected {
+    border: 2px solid white;
+}
+button.control-btn {
+    font-size: 16px;
+}
+button.control-btn.selected {
+    color: blue;
+}
