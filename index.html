@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Quick Board</title>
     <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.3.1/fabric.min.js"></script>
     <div class="logo">
       <img src="logo.png" width="200" height="35" alt="QuickBoard Logo">
     </div>
@@ -15,22 +16,18 @@
         top: 0;
         left: 0;
       }
-
       .color-options {
-        margin-top: -200px; /*중간위치->50px*/
+        margin-top: 50px;
       }
-
       .color-row {
         display: flex;
       }
-
       .color-option {
         width: 50px;
         height: 50px;
         margin: 5px;
         cursor: pointer;
       }
-
       .btn-info {
             display: none;
             position: absolute;
@@ -62,7 +59,7 @@
         <div class="color-option" style="background-color: #e67e22" data-color="#e67e22"></div>
       </div>
       <div class="color-row">
-        <div class="color-option" style="background-color: #f1c40f" data-color="#e74c3c"></div>
+        <div class="color-option" style="background-color: #f1c40f" data-color="#f1c40f"></div>
         <div class="color-option" style="background-color: #2ecc71" data-color="#2ecc71"></div>
       </div>
       <div class="color-row">
@@ -74,7 +71,7 @@
         <div class="color-option" style="background-color: palevioletred" data-color="palevioletred"></div>
       </div>
     </div>
-    <canvas></canvas>
+    <canvas id="canvas"></canvas>
     <div class="btns">
       <input
         id="line-width"
@@ -86,61 +83,63 @@
       />
       <button id="share-btn">📣 Share</butt0801on>
       <button id="mode-btn">🩸 Fill</button>
-      <button id="circle-btn">⭕ Circle</button>
+      <button id="eraser-btn">❌ Erase</button>
+      <button id="destroy-btn">💣 Destroy</button>
+      <button id="circle-btn">⭕️ Circle</button>
+      <button id="triangle-btn"> 🔺 Triangle</button>
+      <button id="square-btn">◻️ Square</button>
       <div id="btn-info" class="btn-info"><b>Share with other people</b><br>
       If you want to invite other peple and collaborate with them,<br>
-      copy and send them the link to this drawing</div>
-      <button id="destroy-btn">💣 Destroy</button>
-      <button id="eraser-btn">❌ Erase</button>
+      copy and send them the link to this drawing<br>🔗</div>
+      <input type="text" id="text" placeholder="Add text here... :)" />
       <label for="file">
         📂 Add Photo
         <input type="file" accept="image/*" id="file"
       /></label>
-      <input type="text" id="text" placeholder="Add text here... :)" />
       <button id="crop-btn">✂️ Crop image</button>
-      <button id="save">🖼 Save image</button>
+      <button id="save">🖼️ Save image</button>
     </div>
     <script src="app.js"></script>
     <script>
       const btn = document.getElementById("share-btn");
       const btnInfo = document.getElementById("btn-info");
       let isInfoVisible = false;
-
       btn.addEventListener("mouseenter", () => {
             if (!isInfoVisible) {
                 btnInfo.style.display = "block";
                 isInfoVisible = true;
             }
         });
-
         btn.addEventListener("mouseleave", () => {
             if (isInfoVisible) {
                 btnInfo.style.display = "none";
                 isInfoVisible = false;
             }
         });
-  </script>
+    </script>
     <script>
-      const socket=new WebSocket("ws://3.35.46.31:8080/");
-      socket.addEventListener("open", () => {
-       console.log("WebSocket is open");
-      });
-      socket.addEventListener("message", (event) => {
-       console.log("Message from server:", event.data);
-      });
-      socket.addEventListener("message", (error) => {
-       console.log("Error has occured:", error);
-      });
-      socket.addEventListener("close", () => {
-       console.log("WebSocket is closed");
-      });
-      socket.onopen = (event) => {
-       socket.send("Hello Server, we are connected");
-      };
-      socket.onerror = (error) => {
-       socket.close();
-       console.log("WebSocket connection is closed due to:", error);
-      };
-   </script>
+    const socket = new WebSocket("ws://3.35.46.31:8080/");
+    socket.addEventListener("open", () => {
+      console.log("WebSocket is open");
+    });
+    socket.addEventListener("message", (event) => {
+      console.log("Message from server:", event.data);
+    });
+    socket.addEventListener("message", (error) => {
+      console.log("Error has occured:", error);
+    });
+    socket.addEventListener("close", () => {
+      console.log("WebSocket is closed");
+    });
+    socket.onopen = (event) => {
+      socket.send("Hello Server, we are connected");
+    };
+    socket.onerror = (error) => {
+      socket.close();
+      console.log("WebSocket connection is closed due to:", error);
+    };
+    </script>
   </body>
-</html>
+</html>                                                                                                                            
+
+

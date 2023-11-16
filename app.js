@@ -5,8 +5,11 @@ const eraserBtn = document.getElementById("eraser-btn");
 const destroyBtn = document.getElementById("destroy-btn");
 const modeBtn = document.getElementById("mode-btn");
 const circleBtn = document.getElementById("circle-btn");
+const triangleBtn = document.getElementById("triangle-btn");
+const squareBtn = document.getElementById("square-btn");
 const shareBtn = document.getElementById("share-btn");
 const cropBtn = document.getElementById("crop-btn");
+
 const colorOptions = Array.from(
   document.getElementsByClassName("color-option")
 );
@@ -22,39 +25,196 @@ canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
 ctx.lineWidth = lineWidth.value;
 ctx.lineCap = "round";
-let isPainting = false;
-let isFilling = false;
 
 //원 그리기
 let isDrawingCircle = false;
-let circleStartX, circleStartY;
+let circleStartPoint;
+let resizingCircle = false;
 
-function startDrawingCircle(event) {
-  if (event.buttons !== 1) return; // 왼쪽 버튼(마우스 클릭)이 아니면 리턴
+circleBtn.addEventListener("click", () => {
   isDrawingCircle = true;
-  circleStartX = event.offsetX;
-  circleStartY = event.offsetY;
-}
 
-function drawCircle(event) {
-  if (!isDrawingCircle) return; // 그리기 동작이 아니라면 리턴
-  const circleRadius = Math.sqrt(
-    Math.pow(event.offsetX - circleStartX, 2) +
-    Math.pow(event.offsetY - circleStartY, 2)
+  canvas.addEventListener("mousedown", function (event) {
+    if (isDrawingCircle) {
+      circleStartPoint = { x: event.offsetX, y: event.offsetY };
+    }
+  });
+ 
+  canvas.addEventListener("mouseup", function (event) {
+    if (isDrawingCircle) {
+      const radius = calculateRadius(circleStartPoint, {
+        x: event.offsetX,
+        y: event.offsetY,
+      });
+      
+      drawCircle(circleStartPoint, radius);
+
+      isDrawingCircle = false;
+    }
+    resizingCircle = false;
+  });
+
+  canvas.addEventListener("mousemove", function (event) {
+    if (isDrawingCircle) {
+      const radius = calculateRadius(circleStartPoint, {
+        x: event.offsetX,
+        y: event.offsetY,
+      });
+
+      drawCircle(circleStartPoint, radius);
+    }
+  });
+});
+
+function calculateRadius(point1, point2) {
+  return Math.sqrt(
+    Math.pow(point1.x - point2.x, 2) + Math.pow(point1.y - point2.y, 2)
   );
-
-  ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT); // 기존에 그려진 것을 지우기
-  ctx.beginPath();
-  ctx.arc(circleStartX, circleStartY, circleRadius, 0, 2 * Math.PI);
-  ctx.stroke();
 }
 
-function stopDrawingCircle() {
-  if (isDrawingCircle) {
-    isDrawingCircle = false;
-    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT); // 그림이 끝났을 때 마지막 테두리를 지우기
+function drawCircle(center, radius) {
+  ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  ctx.beginPath();
+  ctx.arc(center.x, center.y, radius, 0, 2 * Math.PI);
+
+  if (isFilling) {
+    ctx.fill();
+  } else {
+    ctx.stroke();
   }
 }
+
+//삼각형 그리기
+let isDrawingTriangle = false;
+let triangleStartPoint;
+let resizingTriangle = false;
+
+triangleBtn.addEventListener("click", () => {
+  isDrawingTriangle = true;
+
+  canvas.addEventListener("mousedown", function (event) {
+    if (isDrawingTriangle) {
+      triangleStartPoint = { x: event.offsetX, y: event.offsetY };
+    }
+  });
+
+  canvas.addEventListener("mouseup", function (event) {
+    if (isDrawingTriangle) {
+      const triangleEndPoint = { x: event.offsetX, y: event.offsetY };
+
+      drawTriangle(triangleStartPoint, triangleEndPoint);
+
+      isDrawingTriangle = false;
+    }
+    resizingTriangle = false;
+  });
+
+  canvas.addEventListener("mousemove", function (event) {
+    if (isDrawingTriangle) {
+      const triangleEndPoint = { x: event.offsetX, y: event.offsetY };
+
+      drawTriangle(triangleStartPoint, triangleEndPoint);
+    }
+  });
+});
+
+function drawTriangle(startPoint, endPoint) {
+  const midPointX = (startPoint.x + endPoint.x) / 2;
+  const midPointY = (startPoint.y + endPoint.y) / 2;
+
+  ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  ctx.beginPath();
+  ctx.moveTo(startPoint.x, startPoint.y);
+  ctx.lineTo(endPoint.x, endPoint.y);
+  ctx.lineTo(midPointX, startPoint.y);
+  ctx.closePath();
+
+  if (isFilling) {
+    ctx.fill();
+  } else {
+    ctx.stroke();
+  }
+}
+
+//사각형 그리기
+let isDrawingSquare = false;
+let squareStartPoint;
+let selectedSquare;
+
+squareBtn.addEventListener("click", () => {
+  isDrawingSquare = true;
+
+  canvas.addEventListener("mousedown", function (event) {
+    if (isDrawingSquare) {
+      squareStartPoint = { x: event.offsetX, y: event.offsetY };
+    } else {
+      selectedSquare = findSelectedSquare(event.offsetX, event.offsetY);
+    }
+  });
+
+  canvas.addEventListener("mouseup", function (event) {
+    if (isDrawingSquare) {
+      const squareEndPoint = { x: event.offsetX, y: event.offsetY };
+
+    
+      drawSquare(squareStartPoint, squareEndPoint);
+
+      isDrawingSquare = false;
+    }
+  });
+
+  canvas.addEventListener("mousemove", function (event) {
+    if (selectedSquare) {
+      const newWidth = event.offsetX - selectedSquare.x;
+      const newHeight = event.offsetY - selectedSquare.y;
+
+      resizeSquare(selectedSquare, newWidth, newHeight);
+    }
+  });
+});
+
+function findSelectedSquare(x, y) {
+  for (const square of squares) {
+    if (
+      x >= square.x &&
+      x <= square.x + square.width &&
+      y >= square.y &&
+      y <= square.y + square.height
+    ) {
+      return square;
+    }
+  }
+  return null;
+}
+
+function resizeSquare(square, newWidth, newHeight) {
+  ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  if (isFilling) {
+    ctx.fillRect(square.x, square.y, newWidth, newHeight);
+  } else {
+    ctx.strokeRect(square.x, square.y, newWidth, newHeight);
+  }
+}
+
+function drawSquare(startPoint, endPoint) {
+  const width = endPoint.x - startPoint.x;
+  const height = endPoint.y - startPoint.y;
+
+  ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  if (isFilling) {
+    ctx.fillRect(startPoint.x, startPoint.y, width, height);
+  } else {
+    ctx.strokeRect(startPoint.x, startPoint.y, width, height);
+  }
+}
+
+//펜 그리기
+let isPainting = false;
+let isFilling = false;
 
 function onMove(event) {
   if (isPainting) {
@@ -107,27 +267,6 @@ function onCanvasClick() {
   }
 }
 
-function OnSquareClick(event) {
-    switch (event.type) {
-      case "mousedown":
-        console.log("mousedown");
-        shape.startPainting.down(event);
-        break;
-      case "mousemove":
-        console.log("mousemove");
-        shape.onMove.move(event);
-        break;
-      case "mouseup":
-        console.log("mouseup");
-        shape.cancelPainting.up(event);
-        break;
-      case "mouseleave":
-        shape.cancelPainting.up(event);
-        console.log("mouseout");
-        break;
-    }
-  }
-
 function onDestroyClick() {
   ctx.fillStyle = "white";
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -179,10 +318,6 @@ lineWidth.addEventListener("change", onLineWidthChange);
 color.addEventListener("change", onColorChange);
 colorOptions.forEach((color) => color.addEventListener("click", onColorClick));
 modeBtn.addEventListener("click", onModeClick);
-circleBtn.addEventListener("mousedown", startDrawingCircle);
-canvas.addEventListener("mousemove", drawCircle);
-canvas.addEventListener("mouseup", stopDrawingCircle);
-canvas.addEventListener("mouseleave", stopDrawingCircle);
 destroyBtn.addEventListener("click", onDestroyClick);
 eraserBtn.addEventListener("click", onEraserClick);
 fileInput.addEventListener("change", onFileChange);
